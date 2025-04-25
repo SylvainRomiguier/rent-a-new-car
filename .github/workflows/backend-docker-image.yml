@@ -41,7 +41,7 @@ jobs:
         with:
           push: true
           file: ./backend/Dockerfile
-          tags: backend-${{ steps.meta.outputs.tags }}
+          tags: ${{ steps.meta.outputs.tags }}-backend
           labels: ${{ steps.meta.outputs.labels }}
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v2
