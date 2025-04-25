@@ -5,7 +5,7 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
-FROM node:stable-alpine
+FROM node:current-alpine
 COPY --from=build /app/dist ./dist
 EXPOSE 3000
 CMD ["npm", "run", "start;"]
