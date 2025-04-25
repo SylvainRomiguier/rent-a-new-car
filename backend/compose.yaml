@@ -1,0 +1,13 @@
+services:
+  rental-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    container_name: backend-frontend
+    restart: unless-stopped
+    networks:
+      - app-network
+networks:
+  app-network:
