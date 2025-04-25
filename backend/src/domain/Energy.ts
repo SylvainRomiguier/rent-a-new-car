@@ -13,6 +13,8 @@ export const energyValidator = z.enum([
   "CNG",
 ]);
 
+export type EnergyType = z.infer<typeof energyValidator>;
+
 export class Energy extends ValueObject<string> {
   constructor(value: string) {
     const parsedValue = energyValidator.parse(value);

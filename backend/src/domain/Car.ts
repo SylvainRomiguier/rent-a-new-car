@@ -4,7 +4,7 @@ import { nameValidator, Name } from "./Name";
 import { yearValidator, Year } from "./Year";
 import { mileageValidator, Mileage } from "./Mileage";
 import { Price, priceValidator } from "./Price";
-import { Energy, energyValidator } from "./Energy";
+import { Energy, EnergyType, energyValidator } from "./Energy";
 
 const carValidator = z.object({
   id: UUIDValidator,
@@ -39,5 +39,18 @@ export class Car {
     this.mileage = new Mileage(parsedData.mileage);
     this.price = new Price(parsedData.price);
     this.energy = new Energy(parsedData.energy);
+  }
+
+  get value(): CarData {
+    return {
+      id: this.id.value,
+      make: this.make.value,
+      model: this.model.value,
+      year: this.year.value,
+      color: this.color.value,
+      mileage: this.mileage.value,
+      price: this.price.value,
+      energy: this.energy.value as EnergyType,
+    };
   }
 }
