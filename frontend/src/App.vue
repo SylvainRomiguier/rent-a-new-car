@@ -3,15 +3,8 @@
   <HelloWorld msg="Welcome to Your Vue.js App Sylvain"/>
 </template>
 
-<script>
+<script lang="ts" setup>
 import HelloWorld from './components/HelloWorld.vue'
-
-export default {
-  name: 'App',
-  components: {
-    HelloWorld
-  }
-}
 </script>
 
 <style>
