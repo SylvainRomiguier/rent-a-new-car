@@ -1,4 +1,5 @@
-name: ci
+name: ci-backend
+# This workflow builds and pushes a Docker image for the backend service
 
 on:
   push:
