@@ -2,7 +2,7 @@ FROM node:slim AS build
 WORKDIR /app
 COPY ./backend/package*.json ./
 RUN npm install
-COPY . .
+COPY ./backend .
 RUN npm run build
 
 FROM node:current-alpine
