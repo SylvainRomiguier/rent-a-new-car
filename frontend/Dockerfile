@@ -2,7 +2,7 @@ FROM node:slim AS build
 WORKDIR /app
 COPY ./frontend/package*.json ./
 RUN npm install
-COPY . .
+COPY ./frontend .
 RUN npm run build
 
 FROM nginx:stable-alpine
