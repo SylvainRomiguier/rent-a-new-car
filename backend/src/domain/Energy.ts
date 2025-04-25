@@ -10,6 +10,7 @@ export const energyValidator = z.enum([
   "ETHANOL",
   "BIOFUEL",
   "LPG",
+  "CNG",
 ]);
 
 export class Energy extends ValueObject<string> {
