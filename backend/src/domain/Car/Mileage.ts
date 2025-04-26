@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ValueObject } from "./ValueObject";
+import { ValueObject } from "../common/ValueObject";
 
 export const mileageValidator = z.number().int().min(0);
 

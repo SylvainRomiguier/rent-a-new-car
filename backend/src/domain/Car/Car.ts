@@ -1,10 +1,13 @@
 import { z } from "zod";
-import { UUIDValidator, UUID } from "./UUID";
-import { nameValidator, Name } from "./Name";
+import { UUIDValidator, UUID } from "../common/UUID";
+import { nameValidator, Name } from "../common/Name";
 import { yearValidator, Year } from "./Year";
 import { mileageValidator, Mileage } from "./Mileage";
-import { Price, priceValidator } from "./Price";
+import { Price, priceValidator } from "../common/Price";
 import { Energy, EnergyType, energyValidator } from "./Energy";
+import { CustomDate } from "../Booking/CustomDate";
+import { Booking } from "../Booking/Booking";
+import { IUUIDGenerator } from "../IUUIDGenerator";
 
 const carValidator = z.object({
   id: UUIDValidator,
@@ -52,5 +55,25 @@ export class Car {
       price: this.price.value,
       energy: this.energy.value as EnergyType,
     };
+  }
+
+  book(
+    customerId: UUID,
+    startDate: CustomDate,
+    endDate: CustomDate,
+    uuidGenerator: IUUIDGenerator
+  ): Booking {
+    return new Booking({
+      id: uuidGenerator.generate(),
+      customerId: customerId.value,
+      carId: this.id.value,
+      startDate: startDate.value,
+      endDate: endDate.value,
+      status: startDate.isToday() ? "pending" : "confirmed",
+      totalPrice:
+        (this.price.value *
+          (endDate.value.getTime() - startDate.value.getTime())) /
+        (1000 * 3600 * 24),
+    });
   }
 }
