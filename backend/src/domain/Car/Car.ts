@@ -57,14 +57,9 @@ export class Car {
     };
   }
 
-  book(
-    customerId: UUID,
-    startDate: CustomDate,
-    endDate: CustomDate,
-    uuidGenerator: IUUIDGenerator
-  ): Booking {
+  book(customerId: UUID, startDate: CustomDate, endDate: CustomDate): Booking {
     return new Booking({
-      id: uuidGenerator.generate(),
+      id: new UUID().value,
       customerId: customerId.value,
       carId: this.id.value,
       startDate: startDate.value,
