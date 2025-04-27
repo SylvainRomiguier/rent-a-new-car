@@ -9,7 +9,7 @@ import {
 import { Price, priceValidator } from "../common/Price";
 
 export const bookingValidator = z.object({
-  id: UUIDValidator,
+  id: UUIDValidator.optional(),
   customerId: UUIDValidator,
   carId: UUIDValidator,
   startDate: customDateValidator,

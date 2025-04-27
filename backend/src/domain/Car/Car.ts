@@ -10,7 +10,7 @@ import { Booking } from "../Booking/Booking";
 import { bookingStatusValidator } from "../Booking/BookingStatus";
 import { IBookingService } from "../IBookingService";
 
-const carValidator = z.object({
+export const carValidator = z.object({
   id: UUIDValidator.optional(),
   make: nameValidator,
   model: nameValidator,
