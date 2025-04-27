@@ -3,8 +3,6 @@ import { ValueObject } from "../common/ValueObject";
 
 export const bookingStatusValidator = z.enum([
   "pending",
-  "confirmed",
-  "canceled",
   "completed",
 ]);
 

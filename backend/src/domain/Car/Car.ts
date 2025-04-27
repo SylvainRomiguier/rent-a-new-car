@@ -7,10 +7,11 @@ import { Price, priceValidator } from "../common/Price";
 import { Energy, EnergyType, energyValidator } from "./Energy";
 import { CustomDate } from "../Booking/CustomDate";
 import { Booking } from "../Booking/Booking";
-import { IUUIDGenerator } from "../IUUIDGenerator";
+import { bookingStatusValidator } from "../Booking/BookingStatus";
+import { IBookingService } from "../IBookingService";
 
 const carValidator = z.object({
-  id: UUIDValidator,
+  id: UUIDValidator.optional(),
   make: nameValidator,
   model: nameValidator,
   year: yearValidator,
@@ -31,8 +32,17 @@ export class Car {
   mileage: Mileage;
   price: Price;
   energy: Energy;
+  pendingBookings: Booking[] = [];
 
-  constructor(data: CarData) {
+  constructor(data: CarData, bookingService: IBookingService) {
+    if(data.id) {
+      bookingService.getPendingBookingsByCarId(data.id).then((bookings) => {
+        this.pendingBookings = bookings.map((booking) => new Booking(booking));
+      })
+      .catch((error) => {
+        console.error("Error fetching pending bookings:", error);
+      });
+    }
     const parsedData = carValidator.parse(data);
     this.id = new UUID(parsedData.id);
     this.make = new Name(parsedData.make);
@@ -58,17 +68,28 @@ export class Car {
   }
 
   book(customerId: UUID, startDate: CustomDate, endDate: CustomDate): Booking {
-    return new Booking({
+
+    const newBooking = new Booking({
       id: new UUID().value,
       customerId: customerId.value,
       carId: this.id.value,
       startDate: startDate.value,
       endDate: endDate.value,
-      status: startDate.isToday() ? "pending" : "confirmed",
+      status: bookingStatusValidator.enum.pending,
       totalPrice:
         (this.price.value *
           (endDate.value.getTime() - startDate.value.getTime())) /
         (1000 * 3600 * 24),
     });
+
+    if(this.pendingBookings.length > 0) {
+      const overlappingBooking = this.pendingBookings.find((booking) => booking.isOverlapping(newBooking));
+      if(overlappingBooking) {
+        throw new Error("Car is already booked for the selected dates.");
+      }
+    }
+
+    return newBooking;
   }
+
 }

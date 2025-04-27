@@ -22,4 +22,11 @@ export class CustomDate extends ValueObject<Date> {
       this.value.getFullYear() === today.getFullYear()
     );
   }
+  isBefore(other: CustomDate): boolean {
+    return this.value < other.value;
+  }
+
+  isAfter(other: CustomDate): boolean {
+    return this.value > other.value;
+  }
 }

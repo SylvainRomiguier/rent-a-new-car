@@ -49,4 +49,17 @@ export class Booking {
       totalPrice: this.totalPrice.value,
     };
   }
+
+  complete(): void {
+    this.status = new BookingStatus(bookingStatusValidator.enum.completed);
+  }
+
+  isOverlapping(other: Booking): boolean {
+    return (
+      (this.startDate.isBefore(other.endDate) &&
+        this.endDate.isAfter(other.startDate)) ||
+      (other.startDate.isBefore(this.endDate) &&
+        other.endDate.isAfter(this.startDate))
+    );
+  }
 }
