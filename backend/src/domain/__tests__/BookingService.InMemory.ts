@@ -1,5 +1,5 @@
 import { BookingData } from "../Booking/Booking";
-import { BookingStatusType } from "../Booking/BookingStatus";
+import { BookingStatusType, bookingStatusValidator } from "../Booking/BookingStatus";
 import { IBookingService } from "../IBookingService";
 
 export class InMemoryBookingService implements IBookingService {
@@ -14,7 +14,7 @@ export class InMemoryBookingService implements IBookingService {
   }
   async getPendingBookingsByCarId(carId: string): Promise<BookingData[]> {
     return this.bookings.filter(
-      (booking) => booking.carId === carId && booking.status === "pending"
+      (booking) => booking.carId === carId && booking.status === bookingStatusValidator.enum.pending
     );
   }
 
