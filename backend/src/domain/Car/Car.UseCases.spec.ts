@@ -1,20 +1,19 @@
-import { UseCases } from "./UseCases";
-import { CarData } from "./Car/Car";
+import { CarUseCases } from "./Car.UseCases";
+import { CarData } from "./Car";
 import { describe, beforeEach, it } from "node:test";
-import { InMemoryBookingService } from "./__tests__/BookingService.InMemory";
-import { InMemoryCarService } from "./__tests__/CarService.InMemory";
-import { InMemoryCustomerService } from "./__tests__/CustomerService.InMemory";
-import { energyValidator } from "./Car/Energy";
+import { InMemoryBookingService } from "../__tests__/BookingService.InMemory";
+import { InMemoryCarService } from "../__tests__/CarService.InMemory";
+import { InMemoryCustomerService } from "../__tests__/CustomerService.InMemory";
+import { energyValidator } from "./Energy";
 import assert from "node:assert";
-import { carsFixture } from "./__tests__/cars.fixture";
+import { carsFixture } from "../__tests__/cars.fixture";
 
 describe("Use Cases", () => {
-  let useCase: UseCases;
+  let useCase: CarUseCases;
   beforeEach(() => {
-    useCase = new UseCases(
+    useCase = new CarUseCases(
       new InMemoryBookingService(),
-      new InMemoryCarService(),
-      new InMemoryCustomerService()
+      new InMemoryCarService()
     );
   });
 
