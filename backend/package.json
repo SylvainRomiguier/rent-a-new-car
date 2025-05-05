@@ -15,18 +15,21 @@
   "type": "commonjs",
   "main": "dist/core/server.js",
   "scripts": {
-    "dev": "tsc --watch & node dist/core/server.js",
+    "dev": "tsc --watch && node dist/core/server.js",
     "build": "tsc",
     "start": "node dist/core/server.js",
-    "test": "tsc --noEmit && node --import tsx --test src/**/**/*.spec.ts",
-    "test:watch": "tsc --noEmit && node --import tsx --test src/**/*.spec.ts --watch"
+    "test": "tsc --noEmit && node --experimental-test-coverage --test-coverage-exclude=src/domain/__tests__/* --test-coverage-exclude=src/**/*.spec.ts --import tsx --test $(find src -name '*.spec.ts')",
+    "test:watch": "tsc-watch --onSuccess 'pnpm test:watch2'",
+    "test:watch2": "node --watch --import tsx --test $(find src -name '*.spec.ts')"
   },
   "dependencies": {
     "fastify": "^5.3.2",
+    "handlebars": "^4.7.8",
     "zod": "^3.24.3"
   },
   "devDependencies": {
     "@types/node": "^22.14.1",
+    "tsc-watch": "^6.2.1",
     "tsx": "^4.19.3",
     "typescript": "^5.8.3"
   }

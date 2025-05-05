@@ -1,15 +1,28 @@
 import { CarUseCases } from "./Car.UseCases";
-import { CarData } from "./Car";
+import { CarData, CarDataWithPendingBookings, CarProperties } from "./Car";
 import { describe, beforeEach, it } from "node:test";
 import { InMemoryBookingService } from "../__tests__/BookingService.InMemory";
 import { InMemoryCarService } from "../__tests__/CarService.InMemory";
-import { InMemoryCustomerService } from "../__tests__/CustomerService.InMemory";
 import { energyValidator } from "./Energy";
 import assert from "node:assert";
 import { carsFixture } from "../__tests__/cars.fixture";
+import { IPresenter } from "../common/IPresenter";
 
-describe("Use Cases", () => {
+describe("Car Use Cases", () => {
   let useCase: CarUseCases;
+  class CarPresenter implements IPresenter<CarData> {
+    presentedValue: CarDataWithPendingBookings | undefined;
+    present(value: CarDataWithPendingBookings): void {
+      this.presentedValue = value;
+    }
+  }
+
+  class CarsPresenter implements IPresenter<CarData[]> {
+    presentedValue: CarData[] = [];
+    present(value: CarData[]): void {
+      this.presentedValue = value;
+    }
+  }
   beforeEach(() => {
     useCase = new CarUseCases(
       new InMemoryBookingService(),
@@ -18,7 +31,7 @@ describe("Use Cases", () => {
   });
 
   it("should add car", async () => {
-    const carData: CarData = {
+    const newCarData: CarProperties = {
       make: "Test Brand",
       model: "Test Model",
       year: 2023,
@@ -27,17 +40,19 @@ describe("Use Cases", () => {
       mileage: 0,
       energy: energyValidator.enum.GASOLINE,
     };
-    await useCase.addCar(carData);
-    const cars = await useCase.getAllCars();
-    const { id, ...lastCarAdded } = cars[cars.length - 1].value;
-
-    assert.deepEqual(lastCarAdded, carData);
+    await useCase.addCar(newCarData);
+    const carsPresenter = new CarsPresenter();
+    await useCase.getAllCars(carsPresenter);
+    const { id, ...lastCarAdded } =
+      carsPresenter.presentedValue[carsPresenter.presentedValue.length - 1];
+    assert.deepEqual(lastCarAdded, newCarData);
   });
 
   it("should get car by id", async () => {
     const carId = "1dc43148-e72a-4114-8d30-845e0bcc82e0";
-    const car = await useCase.getCarById(carId);
-    assert.deepEqual(car?.value, {
+    const carPresenter = new CarPresenter();
+    await useCase.getCarById(carId, carPresenter);
+    assert.deepEqual(carPresenter.presentedValue, {
       id: "1dc43148-e72a-4114-8d30-845e0bcc82e0",
       make: "Tesla",
       model: "3",
@@ -46,69 +61,79 @@ describe("Use Cases", () => {
       mileage: 5000,
       price: 50,
       energy: energyValidator.enum.ELECTRIC,
+      pendingBookings: [],
     });
   });
 
   it("should get all cars", async () => {
     const carDataList = carsFixture;
-    const cars = await useCase.getAllCars();
-    assert.deepEqual(
-      cars.map((car) => car.value),
-      carDataList
-    );
+    const carsPresenter = new CarsPresenter();
+    await useCase.getAllCars(carsPresenter);
+    assert.deepEqual(carsPresenter.presentedValue, carDataList);
   });
 
   it("should update car", async () => {
-    const carId = "a3de1c07-b312-485b-91aa-89c73bb7879d";
-    const carData = {
-      id: carId,
-      make: "Test Brand",
-      model: "Test Model",
-      year: 2023,
-      price: 100,
-      color: "Red",
-      mileage: 0,
-      energy: energyValidator.enum.GASOLINE,
-    };
-    await useCase.addCar(carData);
+    const carId = "1dc43148-e72a-4114-8d30-845e0bcc82e0";
     const updatedCarData = {
-      make: "Test Brand",
-      model: "Test Model",
-      year: 2023,
-      price: 100,
-      color: "Blue",
-      mileage: 0,
-      energy: energyValidator.enum.GASOLINE,
+      make: "Tesla",
+      model: "3",
+      year: 2024,
+      color: "White",
+      mileage: 6000,
+      price: 50,
+      energy: energyValidator.enum.ELECTRIC,
     };
     await useCase.updateCar(carId, updatedCarData);
-    const car = await useCase.getCarById(carId);
-    assert.deepEqual(car?.value, {
+    const carPresenter = new CarPresenter();
+    await useCase.getCarById(carId, carPresenter);
+    assert.deepEqual(carPresenter.presentedValue, {
       id: carId,
-      make: "Test Brand",
-      model: "Test Model",
-      year: 2023,
-      price: 100,
-      color: "Blue",
-      mileage: 0,
-      energy: energyValidator.enum.GASOLINE,
+      make: "Tesla",
+      model: "3",
+      year: 2024,
+      color: "White",
+      mileage: 6000,
+      price: 50,
+      energy: energyValidator.enum.ELECTRIC,
+      pendingBookings: [],
     });
   });
 
   it("should delete car", async () => {
-    const carId = "2dbaedcd-d652-4467-8ec2-e9e0fd685e2a";
-    const carData = {
-      id: carId,
-      make: "Test Brand",
-      model: "Model to delete",
-      year: 2023,
-      price: 100,
-      color: "Red",
-      mileage: 0,
-      energy: energyValidator.enum.ELECTRIC,
-    };
-    await useCase.addCar(carData);
+    const carId = "1dc43148-e72a-4114-8d30-845e0bcc82e0";
     await useCase.deleteCar(carId);
-    const car = await useCase.getCarById(carId);
-    assert.strictEqual(car, undefined);
+    const carPresenter = new CarPresenter();
+    await assert.rejects(() => useCase.getCarById(carId, carPresenter), (err) =>{
+      assert.strictEqual((err as Error).message, "Car not found");
+      return true;
+    });
+  });
+
+  it("should book car", async () => {
+    const carId = "1dc43148-e72a-4114-8d30-845e0bcc82e0";
+    const customerId = "123e4567-e89b-12d3-a456-426614174001";
+    const startDate = new Date("2025-01-01");
+    const endDate = new Date("2025-01-10");
+    await useCase.bookCar(carId, customerId, startDate, endDate);
+    const carPresenter = new CarPresenter();
+    await useCase.getCarById(carId, carPresenter);
+    assert.strictEqual(carPresenter.presentedValue?.pendingBookings.length, 1);
+  });
+
+  it("should not book car if already booked", async () => {
+    const carId = "1dc43148-e72a-4114-8d30-845e0bcc82e0";
+    const customerId = "123e4567-e89b-12d3-a456-426614174001";
+    const startDate = new Date("2023-10-01");
+    const endDate = new Date("2023-10-10");
+    await useCase.bookCar(carId, customerId, startDate, endDate);
+    try {
+      await useCase.bookCar(carId, customerId, startDate, endDate);
+      assert.fail("Expected error not thrown");
+    } catch (error) {
+      assert.strictEqual(
+        (error as Error).message,
+        "Car is already booked for the selected dates."
+      );
+    }
   });
 });

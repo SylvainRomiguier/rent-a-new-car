@@ -3,7 +3,11 @@ import { ICarService } from "../ICarService";
 import { carsFixture } from "./cars.fixture";
 
 export class InMemoryCarService implements ICarService {
-  private cars: CarData[] = carsFixture;
+  private cars: CarData[] = [];
+
+  constructor() {
+    this.cars = carsFixture;
+  }
 
   async getCarById(carId: string): Promise<CarData | null> {
     return this.cars.find((car) => car.id === carId) || null;

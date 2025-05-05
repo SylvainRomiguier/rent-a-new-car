@@ -6,7 +6,7 @@ import { InMemoryCustomerService } from "../__tests__/CustomerService.InMemory";
 import assert from "node:assert";
 import { customersFixture } from "../__tests__/customers.fixture";
 
-describe("Use Cases", () => {
+describe("Customer Use Cases", () => {
   let useCase: CustomerUseCases;
   const newCustomerId = "2dbaedcd-d652-4467-8ec2-e9e0fd685e2a";
   const newCustomerData: CustomerData = {

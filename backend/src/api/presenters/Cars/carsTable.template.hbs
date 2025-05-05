@@ -1,0 +1,23 @@
+<table>
+    <thead>
+        <tr>
+        <th>Car ID</th>
+        <th>Make</th>
+        <th>Model</th>
+        <th>Year</th>
+        <th>Price</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each cars}}
+        <tr>
+            <td>{{id}}</td>
+            <td>{{make}}</td>
+            <td>{{model}}</td>
+            <td>{{year}}</td>
+            <td>{{price}}</td>
+            <td><button class="btn btn-primary" onclick="editCar({{id}})">Edit</button></td>
+            <td><button class="btn btn-danger" onclick="deleteCar({{id}})">Delete</button></td>
+        {{/each}}
+    </tbody>
+</table>

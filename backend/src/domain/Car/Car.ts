@@ -6,12 +6,10 @@ import { mileageValidator, Mileage } from "./Mileage";
 import { Price, priceValidator } from "../common/Price";
 import { Energy, EnergyType, energyValidator } from "./Energy";
 import { CustomDate } from "../Booking/CustomDate";
-import { Booking } from "../Booking/Booking";
+import { Booking, BookingData } from "../Booking/Booking";
 import { bookingStatusValidator } from "../Booking/BookingStatus";
-import { IBookingService } from "../IBookingService";
 
-export const carValidator = z.object({
-  id: UUIDValidator.optional(),
+export const carPropertiesValidator = z.object({
   make: nameValidator,
   model: nameValidator,
   year: yearValidator,
@@ -20,29 +18,27 @@ export const carValidator = z.object({
   price: priceValidator,
   energy: energyValidator,
 });
+export type CarProperties = z.infer<typeof carPropertiesValidator>;
+
+export const carValidator = carPropertiesValidator.extend({
+  id: UUIDValidator,
+});
 
 export type CarData = z.infer<typeof carValidator>;
 
-export class Car {
-  id: UUID;
-  make: Name;
-  model: Name;
-  year: Year;
-  color: Name;
-  mileage: Mileage;
-  price: Price;
-  energy: Energy;
-  pendingBookings: Booking[] = [];
+export type CarDataWithPendingBookings = CarData & {pendingBookings : BookingData[]}
 
-  constructor(data: CarData, bookingService: IBookingService) {
-    if(data.id) {
-      bookingService.getPendingBookingsByCarId(data.id).then((bookings) => {
-        this.pendingBookings = bookings.map((booking) => new Booking(booking));
-      })
-      .catch((error) => {
-        console.error("Error fetching pending bookings:", error);
-      });
-    }
+export class Car {
+  protected id: UUID;
+  protected make: Name;
+  protected model: Name;
+  protected year: Year;
+  protected color: Name;
+  protected mileage: Mileage;
+  protected price: Price;
+  protected energy: Energy;
+
+  constructor(data: CarData) {
     const parsedData = carValidator.parse(data);
     this.id = new UUID(parsedData.id);
     this.make = new Name(parsedData.make);
@@ -64,11 +60,37 @@ export class Car {
       mileage: this.mileage.value,
       price: this.price.value,
       energy: this.energy.value as EnergyType,
+     
+    };
+  }
+
+}
+
+export class CarWithPendingBookings extends Car {
+  pendingBookings: Booking[] = [];
+
+  constructor(data: CarData, pendingBookings: BookingData[]) {
+    super(data);
+    this.pendingBookings = pendingBookings.map(
+      (booking) => new Booking(booking)
+    );
+  }
+
+  get value(): CarDataWithPendingBookings {
+    return {
+      id: this.id.value,
+      make: this.make.value,
+      model: this.model.value,
+      year: this.year.value,
+      color: this.color.value,
+      mileage: this.mileage.value,
+      price: this.price.value,
+      energy: this.energy.value as EnergyType,
+      pendingBookings: this.pendingBookings.map((booking) => booking.value),
     };
   }
 
   book(customerId: UUID, startDate: CustomDate, endDate: CustomDate): Booking {
-
     const newBooking = new Booking({
       id: new UUID().value,
       customerId: customerId.value,
@@ -82,14 +104,15 @@ export class Car {
         (1000 * 3600 * 24),
     });
 
-    if(this.pendingBookings.length > 0) {
-      const overlappingBooking = this.pendingBookings.find((booking) => booking.isOverlapping(newBooking));
-      if(overlappingBooking) {
+    if (this.pendingBookings.length > 0) {
+      const overlappingBooking = this.pendingBookings.find((booking) =>
+        booking.isOverlapping(newBooking)
+      );
+      if (overlappingBooking) {
         throw new Error("Car is already booked for the selected dates.");
       }
     }
 
     return newBooking;
   }
-
 }
