@@ -15,8 +15,14 @@
   "type": "commonjs",
   "main": "dist/core/server.js",
   "scripts": {
-    "dev": "tsc --watch && node dist/core/server.js",
-    "build": "tsc",
+    "dev": "pnpm clean && tsc-watch --onSuccess 'node dist/core/server.js'",
+    "build": "pnpm clean && tsc && pnpm copy-templates",
+    "copy-templates": "cp -r src/api/templates dist/api/templates",
+    "clean": "rm -rf dist",
+    "lint": "eslint --ext .ts src",
+    "lint:fix": "eslint --ext .ts src --fix",
+    "prettier": "prettier --write \"src/**/*.ts\"",
+    "prettier:check": "prettier --check \"src/**/*.ts\"",
     "start": "node dist/core/server.js",
     "test": "tsc --noEmit && node --experimental-test-coverage --test-coverage-exclude=src/domain/__tests__/* --test-coverage-exclude=src/**/*.spec.ts --import tsx --test $(find src -name '*.spec.ts')",
     "test:watch": "tsc-watch --onSuccess 'pnpm test:watch2'",
@@ -29,6 +35,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.14.1",
+    "raw-loader": "^4.0.2",
     "tsc-watch": "^6.2.1",
     "tsx": "^4.19.3",
     "typescript": "^5.8.3"

@@ -3,7 +3,7 @@ import { IPresenter } from "../../../domain/common/IPresenter";
 
 export class CarJsonPresenter implements IPresenter<CarData> {
   presentedValue: CarData | undefined;
-  present(car:CarData): void {
+  present(car: CarData): void {
     this.presentedValue = car;
   }
 }

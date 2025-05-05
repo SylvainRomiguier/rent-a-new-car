@@ -1,0 +1,27 @@
+<div>
+  <h1> Car ID: {{car.id}}</h1>
+  <p>Make: {{car.make}}</p>
+  <p>Model: {{car.model}}</p>
+  <p>Year: {{car.year}}</p>
+  <p>Price per day: ${{car.price}}</p>
+  <p>Color: {{car.color}}</p>
+  <p>Mileage: {{car.mileage}} miles</p>
+  <p>Energy: {{car.energy}}</p>
+
+  <h2>Pending bookings</h2>
+  <ul>
+    {{#each car.pendingBookings}}
+      <li>Booking ID:
+        {{this.id}}
+        - Customer ID:
+        {{this.customerId}}
+        - Start Date:
+        {{this.startDate}}
+        - End Date:
+        {{this.endDate}}
+        - Total Price:
+        {{this.totalPrice}}
+      </li>
+    {{/each}}
+  </ul>
+</div>
