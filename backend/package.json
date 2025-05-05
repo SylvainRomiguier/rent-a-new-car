@@ -15,7 +15,8 @@
   "type": "commonjs",
   "main": "dist/core/server.js",
   "scripts": {
-    "dev": "pnpm clean && tsc-watch --onSuccess 'node dist/core/server.js'",
+    "dev": "pnpm clean && tsc-watch --onSuccess 'pnpm start:dev'",
+    "start:dev": "pnpm copy-templates && node dist/core/server.js",
     "build": "pnpm clean && tsc && pnpm copy-templates",
     "copy-templates": "cp -r src/api/templates dist/api/templates",
     "clean": "rm -rf dist",
