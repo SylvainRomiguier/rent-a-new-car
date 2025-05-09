@@ -41,7 +41,7 @@ jobs:
         with:
           push: true
           context: ./backend
-          file: ./backend/Dockerfile
+          file: Dockerfile
           tags: ${{ steps.meta.outputs.tags }}-backend
           labels: ${{ steps.meta.outputs.labels }}
       - name: Generate artifact attestation
