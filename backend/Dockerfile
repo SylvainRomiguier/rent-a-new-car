@@ -1,9 +1,10 @@
-FROM node:lts-alpine AS build
+FROM node:slim AS build
 WORKDIR /app
 COPY ./backend/package*.json ./
-RUN npm install
+RUN wget -qO- https://get.pnpm.io/install.sh | ENV="$HOME/.bashrc" SHELL="$(which bash)" bash -
+RUN pnpm install
 COPY ./backend .
-RUN npm run build
+RUN pnpm build
 
 FROM node:lts-alpine
 COPY --from=build /app/dist ./dist
