@@ -1,16 +1,16 @@
 import Handlebars from "handlebars";
 import fs from "fs";
-import { CarData } from "../../../domain/Car/Car";
+import { CustomerData } from "../../../domain/Customer/Customer";
 import { IPresenter } from "../../../domain/common/IPresenter";
 import path from "path";
 
-export class CarsHtmlPresenter implements IPresenter<CarData[]> {
+export class CustomersHtmlPresenter implements IPresenter<CustomerData[]> {
   presentedValue: string = "";
   private html:string;
   constructor() {
     try {
       this.html = fs.readFileSync(
-        path.resolve(__dirname, "../../templates/carsTable.template.hbs"),
+        path.resolve(__dirname, "../../templates/customersTable.template.hbs"),
         "utf-8"
       );
     } catch (error) {
@@ -18,13 +18,13 @@ export class CarsHtmlPresenter implements IPresenter<CarData[]> {
       throw error;
     }
   }
-  present(cars: CarData[]): void {
-    if (!cars || cars.length === 0) {
-      this.presentedValue = "<h1 id='carsTable'>No cars found</h1>";
+  present(customers: CustomerData[]): void {
+    if (!customers || customers.length === 0) {
+      this.presentedValue = "<h1 id='customersTable'>No customers found</h1>";
       return;
     }
     this.presentedValue = Handlebars.compile(this.html)({
-      cars,
+      customers,
     });
   }
 }

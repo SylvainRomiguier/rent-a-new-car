@@ -5,13 +5,18 @@ import { Email, emailValidator } from "./Email";
 import { Phone, phoneValidator } from "./Phone";
 import { Address, addressValidator } from "./Address";
 
-export const customerValidator = z.object({
-  id: UUIDValidator.optional(),
+
+export const customerPropertiesValidator = z.object({
   firstName: nameValidator,
   lastName: nameValidator,
   email: emailValidator,
   phone: phoneValidator,
   address: addressValidator,
+});
+export type CustomerProperties = z.infer<typeof customerPropertiesValidator>;
+
+export const customerValidator = customerPropertiesValidator.extend({
+  id: UUIDValidator,
 });
 
 export type CustomerData = z.infer<typeof customerValidator>;

@@ -1,46 +1,39 @@
-<table>
-  <thead>
-    <tr>
-      <th>Car ID</th>
-      <th>Make</th>
-      <th>Model</th>
-      <th>Year</th>
-      <th>Color</th>
-      <th>Mileage</th>
-      <th>Energy</th>
-      <th>Price</th>
-    </tr>
-  </thead>
-  <tbody>
-    {{#each cars}}
-      <tr style="cursor: pointer;">
-        <td>{{id}}</td>
-        <td>{{make}}</td>
-        <td>{{model}}</td>
-        <td>{{year}}</td>
-        <td>{{color}}</td>
-        <td>{{mileage}}</td>
-        <td>{{energy}}</td>
-        <td>{{price}}</td>
-        <td><button
-            class="btn btn-primary"
-            onclick="editCar('{{id}}')"
-          >Edit</button></td>
-        <td><button
-            class="btn btn-danger"
-            onclick="deleteCar('{{id}}')"
-          >Delete</button></td>
+<div class="table-wrapper" id="carsTable">
+  <table class="fl-table">
+    <thead>
+      <tr>
+        <th>Car ID</th>
+        <th>Make</th>
+        <th>Model</th>
+        <th>Year</th>
+        <th>Color</th>
+        <th>Mileage</th>
+        <th>Energy</th>
+        <th>Price</th>
+        <th colspan="2">Actions</th>
       </tr>
-    {{/each}}
-  </tbody>
-</table>
-
-<style>
-  table { width: 100%; border-collapse: collapse; } th, td { border: 1px solid
-  #ddd; padding: 8px; } th { background-color: #f2f2f2; } tr:hover {
-  background-color: #f1f1f1; cursor: pointer; } button { margin: 5px; }
-</style>
-<script>
-  function editCar(carId) { console.log('Edit car with ID:', carId); } function
-  deleteCar(carId) { console.log('Delete car with ID:', carId); }
-</script>
+    </thead>
+    <tbody>
+      {{#each cars}}
+        <tr style="cursor: pointer;">
+          <td>{{id}}</td>
+          <td>{{make}}</td>
+          <td>{{model}}</td>
+          <td>{{year}}</td>
+          <td>{{color}}</td>
+          <td>{{mileage}}</td>
+          <td>{{energy}}</td>
+          <td>{{price}}</td>
+          <td><button
+              class="outline"
+              onclick="editCar('{{json this}}')"
+            >Edit</button></td>
+          <td><button
+              class="outline secondary"
+              onclick="deleteCar('{{id}}')"
+            >Delete</button></td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</div>

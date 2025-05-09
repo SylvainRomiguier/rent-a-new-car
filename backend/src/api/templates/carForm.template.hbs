@@ -1,0 +1,69 @@
+<form action="javascript:saveCar()" id="carForm">
+  <fieldset class="grid">
+    <input id="carId" disabled type="text" placeholder="new car" />
+    <input
+      type="text"
+      id="carMake"
+      name="carMake"
+      placeholder="e.g. Tesla, Ford, BMW"
+      class="form-control"
+      required
+    />
+
+    <input
+      type="text"
+      id="carModel"
+      name="carModel"
+      placeholder="e.g. Model S, Model 3"
+      class="form-control"
+      required
+    />
+
+    <input
+      type="number"
+      id="carYear"
+      name="carYear"
+      placeholder="e.g. 2020"
+      class="form-control"
+      required
+    />
+
+    <input
+      type="number"
+      id="carPrice"
+      name="carPrice"
+      placeholder="e.g. 100"
+      class="form-control"
+      required
+    />
+
+    <input
+      type="text"
+      id="carColor"
+      name="carColor"
+      placeholder="e.g. Red, Blue, Green"
+      class="form-control"
+      required
+    />
+
+    <input
+      type="number"
+      id="carMileage"
+      name="carMileage"
+      placeholder="e.g. 10000"
+      class="form-control"
+      required
+    />
+
+    <select id="carEnergy" name="carEnergy" class="form-control" required>
+      <option value="" disabled selected>Select energy type</option>
+      {{#if energyTypes}}
+        {{#each energyTypes}}
+          <option value="{{this}}">{{this}}</option>
+        {{/each}}
+      {{/if}}
+    </select>
+
+    <button type="submit" id="formButton">Add Car</button>
+  </fieldset>
+</form>

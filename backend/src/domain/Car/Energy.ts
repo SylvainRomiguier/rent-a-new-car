@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { ValueObject } from "../common/ValueObject";
 
-export const energyValidator = z.enum([
+export const energyTypes = [
   "GASOLINE",
   "DIESEL",
   "ELECTRIC",
@@ -11,7 +11,9 @@ export const energyValidator = z.enum([
   "BIOFUEL",
   "LPG",
   "CNG",
-]);
+] as const;
+
+export const energyValidator = z.enum(energyTypes);
 
 export type EnergyType = z.infer<typeof energyValidator>;
 
