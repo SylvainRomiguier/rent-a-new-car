@@ -1,16 +1,16 @@
 FROM node:slim AS build
 WORKDIR /home/node/app
-COPY package*.json ./
+COPY backend/package*.json ./
 RUN npm install -g pnpm@latest
 RUN pnpm install
-COPY tsconfig.json ./
-COPY src ./src
+COPY backend/tsconfig.json ./
+COPY backend/src ./src
 RUN pnpm build
 
 FROM node:slim AS deps
 # Install production dependencies only
 WORKDIR /home/node/app
-COPY package*.json ./
+COPY backend/package*.json ./
 RUN npm install -g pnpm@latest
 RUN pnpm install --prod
 
