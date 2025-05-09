@@ -9,4 +9,4 @@ RUN pnpm build
 FROM node:lts-alpine
 COPY --from=build /app/dist ./dist
 EXPOSE 3000
-CMD ["npm", "run", "start;"]
+CMD ["node", "dist/core/server.js"]
