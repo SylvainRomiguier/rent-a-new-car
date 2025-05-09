@@ -31,13 +31,10 @@ const carUseCases = new CarUseCases(
 );
 const carsController = new CarsController(carUseCases);
 const carController = new CarController(carUseCases);
-const customerUseCases = new CustomerUseCases(
-  new InMemoryCustomerService()
-);
+const customerUseCases = new CustomerUseCases(new InMemoryCustomerService());
 
 const customerController = new CustomerController(customerUseCases);
 const customersController = new CustomersController(customerUseCases);
-
 
 // Register the routes
 const routes = [
@@ -90,7 +87,7 @@ fastify.register(fastifySwaggerUi, {
 // Run the server!
 const start = async () => {
   try {
-    await fastify.listen({ port: 3000 });
+    await fastify.listen({ host: "0.0.0.0", port: 3000 });
     fastify.log.info(`Server is running at http://localhost:3000 youpi`);
   } catch (err) {
     fastify.log.error(err);
