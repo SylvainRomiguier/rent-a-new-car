@@ -1,12 +1,22 @@
 FROM node:slim AS build
-WORKDIR /app
-COPY ./backend/package*.json ./
+WORKDIR /home/node/app
+COPY package*.json ./
 RUN npm install -g pnpm@latest
 RUN pnpm install
-COPY ./backend .
+COPY tsconfig.json ./
+COPY src ./src
 RUN pnpm build
 
-FROM node:lts-alpine
-COPY --from=build /app/dist ./dist
+FROM node:slim AS deps
+# Install production dependencies only
+WORKDIR /home/node/app
+COPY package*.json ./
+RUN npm install -g pnpm@latest
+RUN pnpm install --prod
+
+FROM node:slim
+WORKDIR /home/node/app
+COPY --from=deps /home/node/app/node_modules ./node_modules
+COPY --from=build /home/node/app/dist ./dist
 EXPOSE 3000
 CMD ["node", "dist/core/server.js"]
