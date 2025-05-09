@@ -1,7 +1,7 @@
 FROM node:slim AS build
 WORKDIR /app
 COPY ./backend/package*.json ./
-RUN npm NODE_ENV=development install
+RUN NODE_ENV=development npm install
 COPY ./backend .
 RUN npm run build
 
