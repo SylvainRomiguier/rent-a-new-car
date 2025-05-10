@@ -1,20 +1,20 @@
-import { CustomDate } from "../Booking/CustomDate";
+import { CustomDate } from "../Rental/CustomDate";
 import { IPresenter } from "../common/IPresenter";
 import { UUID } from "../common/UUID";
-import { IBookingService } from "../IBookingService";
+import { IRentalService } from "../IRentalService";
 import { ICarService } from "../ICarService";
 import {
   CarData,
   Car,
-  CarDataWithPendingBookings,
-  CarWithPendingBookings,
+  CarDataWithPendingRentals,
+  CarWithPendingRentals,
   CarProperties,
   carPropertiesValidator,
 } from "./Car";
 
 export class CarUseCases {
   constructor(
-    private bookingService: IBookingService,
+    private rentalService: IRentalService,
     private carService: ICarService
   ) {}
 
@@ -26,18 +26,16 @@ export class CarUseCases {
   }
   async getCarById(
     carId: string,
-    presenter: IPresenter<CarDataWithPendingBookings>
+    presenter: IPresenter<CarDataWithPendingRentals>
   ): Promise<void> {
     const carData = await this.carService.getCarById(carId);
     if (!carData) {
       throw new Error("Car not found");
     }
-    const pendingBookings = await this.bookingService.getPendingBookingsByCarId(
+    const pendingRentals = await this.rentalService.getPendingRentalsByCarId(
       carData.id
     );
-    presenter.present(
-      new CarWithPendingBookings(carData, pendingBookings).value
-    );
+    presenter.present(new CarWithPendingRentals(carData, pendingRentals).value);
   }
   async getAllCars(presenter: IPresenter<CarData[]>): Promise<void> {
     const carDataList = await this.carService.getAllCars();
@@ -63,7 +61,7 @@ export class CarUseCases {
     await this.carService.deleteCar(car.value.id);
   }
 
-  async bookCar(
+  async rentCar(
     carId: string,
     customerId: string,
     startDate: Date,
@@ -73,14 +71,14 @@ export class CarUseCases {
     if (!carData) {
       throw new Error("Car not found");
     }
-    const pendingBookings = await this.bookingService.getPendingBookingsByCarId(
+    const pendingRentals = await this.rentalService.getPendingRentalsByCarId(
       carData.id
     );
-    const booking = new CarWithPendingBookings(carData, pendingBookings).book(
+    const rental = new CarWithPendingRentals(carData, pendingRentals).rent(
       new UUID(customerId),
       new CustomDate(startDate),
       new CustomDate(endDate)
     );
-    await this.bookingService.addBooking(booking.value);
+    await this.rentalService.addRental(rental.value);
   }
 }

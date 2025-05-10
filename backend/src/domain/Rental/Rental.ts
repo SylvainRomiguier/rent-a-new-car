@@ -2,59 +2,59 @@ import { z } from "zod";
 import { UUID, UUIDValidator } from "../common/UUID";
 import { CustomDate, customDateValidator } from "./CustomDate";
 import {
-  BookingStatus,
-  BookingStatusType,
-  bookingStatusValidator,
-} from "./BookingStatus";
+  RentalStatus,
+  RentalStatusType,
+  rentalStatusValidator,
+} from "./RentalStatus";
 import { Price, priceValidator } from "../common/Price";
 
-export const bookingValidator = z.object({
+export const rentalValidator = z.object({
   id: UUIDValidator.optional(),
   customerId: UUIDValidator,
   carId: UUIDValidator,
   startDate: customDateValidator,
   endDate: customDateValidator,
-  status: bookingStatusValidator,
+  status: rentalStatusValidator,
   totalPrice: priceValidator,
 });
-export type BookingData = z.infer<typeof bookingValidator>;
-export class Booking {
+export type RentalData = z.infer<typeof rentalValidator>;
+export class Rental {
   id: UUID;
   customerId: UUID;
   carId: UUID;
   startDate: CustomDate;
   endDate: CustomDate;
-  status: BookingStatus;
+  status: RentalStatus;
   totalPrice: Price;
 
-  constructor(data: BookingData) {
-    const parsedData = bookingValidator.parse(data);
+  constructor(data: RentalData) {
+    const parsedData = rentalValidator.parse(data);
     this.id = new UUID(parsedData.id);
     this.customerId = new UUID(parsedData.customerId);
     this.carId = new UUID(parsedData.carId);
     this.startDate = new CustomDate(parsedData.startDate);
     this.endDate = new CustomDate(parsedData.endDate);
-    this.status = new BookingStatus(parsedData.status);
+    this.status = new RentalStatus(parsedData.status);
     this.totalPrice = new Price(parsedData.totalPrice);
   }
 
-  get value(): BookingData {
+  get value(): RentalData {
     return {
       id: this.id.value,
       customerId: this.customerId.value,
       carId: this.carId.value,
       startDate: this.startDate.value,
       endDate: this.endDate.value,
-      status: this.status.value as BookingStatusType,
+      status: this.status.value as RentalStatusType,
       totalPrice: this.totalPrice.value,
     };
   }
 
   complete(): void {
-    this.status = new BookingStatus(bookingStatusValidator.enum.completed);
+    this.status = new RentalStatus(rentalStatusValidator.enum.completed);
   }
 
-  isOverlapping(other: Booking): boolean {
+  isOverlapping(other: Rental): boolean {
     return (
       (this.startDate.isBefore(other.endDate) &&
         this.endDate.isAfter(other.startDate)) ||

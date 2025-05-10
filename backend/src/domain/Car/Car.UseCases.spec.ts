@@ -1,7 +1,7 @@
 import { CarUseCases } from "./Car.UseCases";
-import { CarData, CarDataWithPendingBookings, CarProperties } from "./Car";
+import { CarData, CarDataWithPendingRentals, CarProperties } from "./Car";
 import { describe, beforeEach, it } from "node:test";
-import { InMemoryBookingService } from "../__tests__/BookingService.InMemory";
+import { InMemoryRentalService } from "../__tests__/RentalService.InMemory";
 import { InMemoryCarService } from "../__tests__/CarService.InMemory";
 import { energyValidator } from "./Energy";
 import assert from "node:assert";
@@ -11,8 +11,8 @@ import { IPresenter } from "../common/IPresenter";
 describe("Car Use Cases", () => {
   let useCase: CarUseCases;
   class CarPresenter implements IPresenter<CarData> {
-    presentedValue: CarDataWithPendingBookings | undefined;
-    present(value: CarDataWithPendingBookings): void {
+    presentedValue: CarDataWithPendingRentals | undefined;
+    present(value: CarDataWithPendingRentals): void {
       this.presentedValue = value;
     }
   }
@@ -25,7 +25,7 @@ describe("Car Use Cases", () => {
   }
   beforeEach(() => {
     useCase = new CarUseCases(
-      new InMemoryBookingService(),
+      new InMemoryRentalService(),
       new InMemoryCarService()
     );
   });
@@ -61,7 +61,7 @@ describe("Car Use Cases", () => {
       mileage: 5000,
       price: 50,
       energy: energyValidator.enum.ELECTRIC,
-      pendingBookings: [],
+      pendingRentals: [],
     });
   });
 
@@ -95,7 +95,7 @@ describe("Car Use Cases", () => {
       mileage: 6000,
       price: 50,
       energy: energyValidator.enum.ELECTRIC,
-      pendingBookings: [],
+      pendingRentals: [],
     });
   });
 
@@ -103,36 +103,39 @@ describe("Car Use Cases", () => {
     const carId = "1dc43148-e72a-4114-8d30-845e0bcc82e0";
     await useCase.deleteCar(carId);
     const carPresenter = new CarPresenter();
-    await assert.rejects(() => useCase.getCarById(carId, carPresenter), (err) =>{
-      assert.strictEqual((err as Error).message, "Car not found");
-      return true;
-    });
+    await assert.rejects(
+      () => useCase.getCarById(carId, carPresenter),
+      (err) => {
+        assert.strictEqual((err as Error).message, "Car not found");
+        return true;
+      }
+    );
   });
 
-  it("should book car", async () => {
+  it("should rent car", async () => {
     const carId = "1dc43148-e72a-4114-8d30-845e0bcc82e0";
     const customerId = "123e4567-e89b-12d3-a456-426614174001";
     const startDate = new Date("2025-01-01");
     const endDate = new Date("2025-01-10");
-    await useCase.bookCar(carId, customerId, startDate, endDate);
+    await useCase.rentCar(carId, customerId, startDate, endDate);
     const carPresenter = new CarPresenter();
     await useCase.getCarById(carId, carPresenter);
-    assert.strictEqual(carPresenter.presentedValue?.pendingBookings.length, 1);
+    assert.strictEqual(carPresenter.presentedValue?.pendingRentals.length, 1);
   });
 
-  it("should not book car if already booked", async () => {
+  it("should not rent car if already rented", async () => {
     const carId = "1dc43148-e72a-4114-8d30-845e0bcc82e0";
     const customerId = "123e4567-e89b-12d3-a456-426614174001";
     const startDate = new Date("2023-10-01");
     const endDate = new Date("2023-10-10");
-    await useCase.bookCar(carId, customerId, startDate, endDate);
+    await useCase.rentCar(carId, customerId, startDate, endDate);
     try {
-      await useCase.bookCar(carId, customerId, startDate, endDate);
+      await useCase.rentCar(carId, customerId, startDate, endDate);
       assert.fail("Expected error not thrown");
     } catch (error) {
       assert.strictEqual(
         (error as Error).message,
-        "Car is already booked for the selected dates."
+        "Car is already rented for the selected dates."
       );
     }
   });

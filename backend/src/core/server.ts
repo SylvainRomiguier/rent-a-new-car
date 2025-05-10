@@ -17,7 +17,7 @@ fastify.register(fastifyStatic, {
 import { CarsController } from "../api/Cars/Cars.controller";
 import { CarUseCases } from "../domain/Car/Car.UseCases";
 import { InMemoryCarService } from "../domain/__tests__/CarService.InMemory";
-import { InMemoryBookingService } from "../domain/__tests__/BookingService.InMemory";
+import { InMemoryRentalService } from "../domain/__tests__/RentalService.InMemory";
 import { CarController } from "../api/Car/Car.controller";
 import { CustomerUseCases } from "../domain/Customer/Customer.UseCases";
 import { InMemoryCustomerService } from "../domain/__tests__/CustomerService.InMemory";
@@ -26,7 +26,7 @@ import { CustomerController } from "../api/Customer/Customer.controller";
 
 // Initialize the use cases and controller
 const carUseCases = new CarUseCases(
-  new InMemoryBookingService(),
+  new InMemoryRentalService(),
   new InMemoryCarService()
 );
 const carsController = new CarsController(carUseCases);
@@ -58,8 +58,8 @@ fastify.register(fastifySwagger, {
   openapi: {
     openapi: "3.0.0",
     info: {
-      title: "Car booking API",
-      description: "API for booking cars",
+      title: "Car rental API",
+      description: "API for rental cars",
       version: "0.1.0",
     },
     servers: [

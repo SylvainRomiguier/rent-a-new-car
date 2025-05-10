@@ -8,10 +8,10 @@
   <p>Mileage: {{car.mileage}} miles</p>
   <p>Energy: {{car.energy}}</p>
 
-  <h2>Pending bookings</h2>
+  <h2>Pending rentals</h2>
   <ul>
-    {{#each car.pendingBookings}}
-      <li>Booking ID:
+    {{#each car.pendingRentals}}
+      <li>Rental ID:
         {{this.id}}
         - Customer ID:
         {{this.customerId}}

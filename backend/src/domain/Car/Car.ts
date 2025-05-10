@@ -5,9 +5,9 @@ import { yearValidator, Year } from "./Year";
 import { mileageValidator, Mileage } from "./Mileage";
 import { Price, priceValidator } from "../common/Price";
 import { Energy, EnergyType, energyValidator } from "./Energy";
-import { CustomDate } from "../Booking/CustomDate";
-import { Booking, BookingData } from "../Booking/Booking";
-import { bookingStatusValidator } from "../Booking/BookingStatus";
+import { CustomDate } from "../Rental/CustomDate";
+import { Rental, RentalData } from "../Rental/Rental";
+import { rentalStatusValidator } from "../Rental/RentalStatus";
 
 export const carPropertiesValidator = z.object({
   make: nameValidator,
@@ -26,7 +26,9 @@ export const carValidator = carPropertiesValidator.extend({
 
 export type CarData = z.infer<typeof carValidator>;
 
-export type CarDataWithPendingBookings = CarData & {pendingBookings : BookingData[]}
+export type CarDataWithPendingRentals = CarData & {
+  pendingRentals: RentalData[];
+};
 
 export class Car {
   protected id: UUID;
@@ -60,23 +62,19 @@ export class Car {
       mileage: this.mileage.value,
       price: this.price.value,
       energy: this.energy.value as EnergyType,
-     
     };
   }
-
 }
 
-export class CarWithPendingBookings extends Car {
-  pendingBookings: Booking[] = [];
+export class CarWithPendingRentals extends Car {
+  pendingRentals: Rental[] = [];
 
-  constructor(data: CarData, pendingBookings: BookingData[]) {
+  constructor(data: CarData, pendingRentals: RentalData[]) {
     super(data);
-    this.pendingBookings = pendingBookings.map(
-      (booking) => new Booking(booking)
-    );
+    this.pendingRentals = pendingRentals.map((rental) => new Rental(rental));
   }
 
-  get value(): CarDataWithPendingBookings {
+  get value(): CarDataWithPendingRentals {
     return {
       id: this.id.value,
       make: this.make.value,
@@ -86,33 +84,33 @@ export class CarWithPendingBookings extends Car {
       mileage: this.mileage.value,
       price: this.price.value,
       energy: this.energy.value as EnergyType,
-      pendingBookings: this.pendingBookings.map((booking) => booking.value),
+      pendingRentals: this.pendingRentals.map((rental) => rental.value),
     };
   }
 
-  book(customerId: UUID, startDate: CustomDate, endDate: CustomDate): Booking {
-    const newBooking = new Booking({
+  rent(customerId: UUID, startDate: CustomDate, endDate: CustomDate): Rental {
+    const newRental = new Rental({
       id: new UUID().value,
       customerId: customerId.value,
       carId: this.id.value,
       startDate: startDate.value,
       endDate: endDate.value,
-      status: bookingStatusValidator.enum.pending,
+      status: rentalStatusValidator.enum.pending,
       totalPrice:
         (this.price.value *
           (endDate.value.getTime() - startDate.value.getTime())) /
         (1000 * 3600 * 24),
     });
 
-    if (this.pendingBookings.length > 0) {
-      const overlappingBooking = this.pendingBookings.find((booking) =>
-        booking.isOverlapping(newBooking)
+    if (this.pendingRentals.length > 0) {
+      const overlappingRental = this.pendingRentals.find((rental) =>
+        rental.isOverlapping(newRental)
       );
-      if (overlappingBooking) {
-        throw new Error("Car is already booked for the selected dates.");
+      if (overlappingRental) {
+        throw new Error("Car is already rented for the selected dates.");
       }
     }
 
-    return newBooking;
+    return newRental;
   }
 }
