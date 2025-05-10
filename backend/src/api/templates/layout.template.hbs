@@ -9,11 +9,25 @@
     <link rel="stylesheet" href="http://localhost:3000/public/styles.css" />
     <script src="http://localhost:3000/public/car-scripts.js"></script>
     <script src="http://localhost:3000/public/customer-scripts.js"></script>
-    <title>{{title}}</title>
+    <title>Car Rental</title>
   </head>
   <body>
     <main class="container-fluid">
-      <h1>{{title}}</h1>
+      <header>
+        <h1>Car Rental</h1>
+        <nav>
+          <ul>
+            <li><a href="/cars/html">Home</a></li>
+            <li><a href="/cars/html">Cars</a></li>
+            <li><a href="/customers/html">Customers</a></li>
+            <li><a href="/rentals/html">Rentals</a></li>
+          </ul>
+        </nav>
+      </header>
+      <section>
+        <h2>Welcome to the Car Rental System</h2>
+        <p>Manage your car rentals efficiently.</p>
+      </section>
       <content />
     </main>
   </body>
