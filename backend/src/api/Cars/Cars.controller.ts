@@ -94,6 +94,40 @@ export class CarsController {
     }
   }
 
+  async rentCar(req: FastifyRequest, res: FastifyReply) {
+    try {
+      const { carId, customerId, startDate, endDate } = req.body as {
+        carId: string;
+        customerId: string;
+        startDate: string;
+        endDate: string;
+      };
+      await this.useCases.rentCar(
+        carId,
+        customerId,
+        new Date(startDate),
+        new Date(endDate)
+      );
+      res.status(200).send({ message: "Car rented successfully" });
+    } catch (error) {
+      console.error("Error renting car:", error);
+      req.log.error("Error renting car:", error);
+      if (error instanceof Error) {
+        if (error.message === "Car not found") {
+          res.status(404).send({ error: "Car not found" });
+        } else if (error.message === "Customer not found") {
+          res.status(404).send({ error: "Customer not found" });
+        } else if (error.message === "Car is already rented for the selected dates.") {
+          res.status(409).send({ error: "Car is already rented for the selected dates." });
+        } else {
+          res.status(500).send({ error: "Internal Server Error" });
+        }
+      } else {
+        res.status(500).send({ error: "Internal Server Error" });
+      }
+    }
+  }
+
   getFastifyRoutes() {
     const routes = [
       {
@@ -156,6 +190,51 @@ export class CarsController {
           },
         },
         handler: this.getAvailableCarsToHTML.bind(this),
+      },
+      {
+        method: "POST",
+        path: "/rent",
+        schema: {
+          tags: ["cars"],
+          description: "Rent a car",
+          body: {
+            type: "object",
+            properties: {
+              carId: { type: "string" },
+              customerId: { type: "string" },
+              startDate: { type: "string", format: "date-time" },
+              endDate: { type: "string", format: "date-time" },
+            },
+            required: ["carId", "customerId", "startDate", "endDate"],
+          },
+          response: {
+            200: {
+              type: "object",
+              properties: {
+                message: { type: "string" },
+              },
+            },
+            404: {
+              type: "object",
+              properties: {
+                error: { type: "string" },
+              },
+            },
+            409: {
+              type: "object",
+              properties: {
+                error: { type: "string" },
+              },
+            },
+            500: {
+              type: "object",
+              properties: {
+                error: { type: "string" },
+              },
+            },
+          },
+        },
+        handler: this.rentCar.bind(this),
       },
     ];
     return routes;
