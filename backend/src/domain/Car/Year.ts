@@ -12,7 +12,4 @@ export class Year extends ValueObject<number> {
     const parsedValue = yearValidator.parse(value);
     super(parsedValue);
   }
-  equals(other: Year): boolean {
-    return this.value === other.value;
-  }
 }

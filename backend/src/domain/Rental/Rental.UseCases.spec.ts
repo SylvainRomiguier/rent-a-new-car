@@ -5,7 +5,7 @@ import { InMemoryRentalService } from "../__tests__/RentalService.InMemory";
 import { InMemoryCarService } from "../__tests__/CarService.InMemory";
 import assert from "node:assert";
 import { IPresenter } from "../common/IPresenter";
-import { RentalData } from "./Rental";
+import { Rental, RentalData } from "./Rental";
 import { InMemoryCustomerService } from "../__tests__/CustomerService.InMemory";
 import { CarDataWithPendingRentals } from "../Car/Car";
 

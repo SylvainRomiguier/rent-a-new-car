@@ -14,7 +14,4 @@ export class Phone extends ValueObject<string> {
     const parsedValue = phoneValidator.parse(value);
     super(parsedValue);
   }
-  equals(other: Phone): boolean {
-    return this.value === other.value;
-  }
 }

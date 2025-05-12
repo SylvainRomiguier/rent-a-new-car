@@ -14,12 +14,4 @@ export class Address extends ValueObject<AddressType> {
     const parsedValue = addressValidator.parse(value);
     super(parsedValue);
   }
-  equals(other: Address): boolean {
-    return (
-      this.value.street === other.value.street &&
-      this.value.city === other.value.city &&
-      this.value.postalCode === other.value.postalCode &&
-      this.value.country === other.value.country
-    );
-  }
 }

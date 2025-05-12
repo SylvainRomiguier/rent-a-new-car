@@ -11,9 +11,7 @@ export class CustomDate extends ValueObject<Date> {
     }
     super(parsedValue);
   }
-  equals(other: CustomDate): boolean {
-    return this.value === other.value;
-  }
+
   isToday(): boolean {
     const today = new Date();
     return (

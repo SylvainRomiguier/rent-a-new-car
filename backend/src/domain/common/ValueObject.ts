@@ -10,6 +10,4 @@ export abstract class ValueObject<T> {
   get value(): T {
     return this._value;
   }
-
-  abstract equals(other: unknown): boolean;
 }

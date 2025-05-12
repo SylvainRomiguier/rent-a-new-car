@@ -8,7 +8,4 @@ export class Name extends ValueObject<string> {
     const parsedValue = nameValidator.parse(value);
     super(parsedValue);
   }
-  equals(other: Name): boolean {
-    return this.value === other.value;
-  }
 }

@@ -22,7 +22,4 @@ export class Energy extends ValueObject<string> {
     const parsedValue = energyValidator.parse(value);
     super(parsedValue);
   }
-  equals(other: Energy): boolean {
-    return this.value === other.value;
-  }
 }

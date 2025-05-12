@@ -8,7 +8,4 @@ export class Mileage extends ValueObject<number> {
     const parsedValue = mileageValidator.parse(value);
     super(parsedValue);
   }
-  equals(other: Mileage): boolean {
-    return this.value === other.value;
-  }
 }

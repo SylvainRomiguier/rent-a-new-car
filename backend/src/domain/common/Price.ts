@@ -8,7 +8,4 @@ export class Price extends ValueObject<number> {
     const parsedValue = priceValidator.parse(value);
     super(parsedValue);
   }
-  equals(other: Price): boolean {
-    return this.value === other.value;
-  }
 }

@@ -10,7 +10,4 @@ export class RentalStatus extends ValueObject<string> {
     const parsedValue = rentalStatusValidator.parse(value);
     super(parsedValue);
   }
-  equals(other: RentalStatus): boolean {
-    return this.value === other.value;
-  }
 }

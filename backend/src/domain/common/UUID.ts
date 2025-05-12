@@ -12,8 +12,4 @@ export class UUID extends ValueObject<string> {
     const parsedValue = UUIDValidator.parse(value);
     super(parsedValue);
   }
- 
-  equals(other: UUID): boolean {
-    return this.value === other.value;
-  }
 }
