@@ -15,10 +15,14 @@ export class RentalsController {
 
   async getRentalsToJSON(req: FastifyRequest, res: FastifyReply) {
     try {
+      const { startDate, endDate } = req.query as {
+        startDate: string;
+        endDate: string;
+      };
       const jsonPresenter = new RentalsArrayJsonPresenter();
       await this.useCases.getAllRentalsBetween2Dates(
-        new Date("2020-01-01"),
-        new Date("2020-12-31"),
+        new Date(startDate),
+        new Date(endDate),
         jsonPresenter
       );
       const rentals = jsonPresenter.presentedValue;
@@ -33,10 +37,14 @@ export class RentalsController {
 
   async getRentalsToHTML(req: FastifyRequest, res: FastifyReply) {
     try {
+      const { startDate, endDate } = req.query as {
+        startDate: string;
+        endDate: string;
+      };
       const htmlPresenter = new RentalsHtmlPresenter();
       await this.useCases.getAllRentalsBetween2Dates(
-        new Date("2020-01-01"),
-        new Date("2020-12-31"),
+        new Date(startDate),
+        new Date(endDate),
         htmlPresenter
       );
       const content = htmlPresenter.presentedValue;
@@ -68,6 +76,14 @@ export class RentalsController {
         schema: {
           tags: ["rentals"],
           description: "Get all rentals in JSON format",
+          querystring: {
+            type: "object",
+            properties: {
+              startDate: { type: "string", format: "date-time" },
+              endDate: { type: "string", format: "date-time" },
+            },
+            required: ["startDate", "endDate"],
+          },
           response: {
             200: {
               type: "array",
@@ -75,19 +91,14 @@ export class RentalsController {
                 type: "object",
                 properties: {
                   id: { type: "string" },
-                  firstName: { type: "string" },
-                  lastName: { type: "string" },
-                  email: { type: "number" },
-                  phone: { type: "string" },
-                  address: {
-                    type: "object",
-                    properties: {
-                      street: { type: "string" },
-                      city: { type: "string" },
-                      postalCode: { type: "string" },
-                      country: { type: "string" },
-                    },
+                  carId: { type: "string" },
+                  customerId: { type: "string" },
+                  startDate: { type: "string" },
+                  endDate: { type: "string" },
+                  status: {
+                    type: "string",
                   },
+                  totalPrice: { type: "number" },
                 },
               },
             },
@@ -101,6 +112,14 @@ export class RentalsController {
         schema: {
           tags: ["rentals"],
           description: "Get all rentals in HTML format",
+          querystring: {
+            type: "object",
+            properties: {
+              startDate: { type: "string", format: "date" },
+              endDate: { type: "string", format: "date" },
+            },
+            required: ["startDate", "endDate"],
+          },
           response: {
             200: {
               type: "string",

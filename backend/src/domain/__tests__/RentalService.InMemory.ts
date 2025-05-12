@@ -6,13 +6,17 @@ import {
 import { IRentalService } from "../IRentalService";
 
 export class InMemoryRentalService implements IRentalService {
+  private rentals: RentalData[] = [];
   async getRentalsByCustomerId(customerId: string): Promise<RentalData[]> {
     return this.rentals.filter((rental) => rental.customerId === customerId);
   }
   async getRentalsByCarId(carId: string): Promise<RentalData[]> {
     return this.rentals.filter((rental) => rental.carId === carId);
   }
-  async getAllRentalsBetween2Dates(startDate:Date, endDate:Date): Promise<RentalData[]> {
+  async getAllRentalsBetween2Dates(
+    startDate: Date,
+    endDate: Date
+  ): Promise<RentalData[]> {
     return this.rentals.filter((rental) => {
       const rentalStartDate = new Date(rental.startDate);
       const rentalEndDate = new Date(rental.endDate);
@@ -52,5 +56,4 @@ export class InMemoryRentalService implements IRentalService {
   async deleteRental(rentalId: string): Promise<void> {
     this.rentals = this.rentals.filter((rental) => rental.id !== rentalId);
   }
-  private rentals: RentalData[] = [];
 }

@@ -7,6 +7,7 @@ import { energyValidator } from "./Energy";
 import assert from "node:assert";
 import { carsFixture } from "../__tests__/cars.fixture";
 import { IPresenter } from "../common/IPresenter";
+import { InMemoryCustomerService } from "../__tests__/CustomerService.InMemory";
 
 describe("Car Use Cases", () => {
   let useCase: CarUseCases;
@@ -26,7 +27,8 @@ describe("Car Use Cases", () => {
   beforeEach(() => {
     useCase = new CarUseCases(
       new InMemoryRentalService(),
-      new InMemoryCarService()
+      new InMemoryCarService(),
+      new InMemoryCustomerService()
     );
   });
 
@@ -99,6 +101,36 @@ describe("Car Use Cases", () => {
     });
   });
 
+  it("should not update car if not found", async () => {
+    const carId = "non-existing-id";
+    const updatedCarData = {
+      make: "Tesla",
+      model: "3",
+      year: 2024,
+      color: "White",
+      mileage: 6000,
+      price: 50,
+      energy: energyValidator.enum.ELECTRIC,
+    };
+    await assert.rejects(
+      () => useCase.updateCar(carId, updatedCarData),
+      (err) => {
+        assert.strictEqual((err as Error).message, "Car not found");
+        return true;
+      }
+    );
+  });
+  it("should not delete car if not found", async () => {
+    const carId = "non-existing-id";
+    await assert.rejects(
+      () => useCase.deleteCar(carId),
+      (err) => {
+        assert.strictEqual((err as Error).message, "Car not found");
+        return true;
+      }
+    );
+  });
+
   it("should delete car", async () => {
     const carId = "1dc43148-e72a-4114-8d30-845e0bcc82e0";
     await useCase.deleteCar(carId);
@@ -138,5 +170,73 @@ describe("Car Use Cases", () => {
         "Car is already rented for the selected dates."
       );
     }
+  });
+
+  it("should not rent car if not found", async () => {
+    const carId = "non-existing-id";
+    const customerId = "123e4567-e89b-12d3-a456-426614174001";
+    const startDate = new Date("2023-10-01");
+    const endDate = new Date("2023-10-10");
+    await assert.rejects(
+      () => useCase.rentCar(carId, customerId, startDate, endDate),
+      (err) => {
+        assert.strictEqual((err as Error).message, "Car not found");
+        return true;
+      }
+    );
+  });
+
+  it("should not rent car if customer not found", async () => {
+    const carId = "1dc43148-e72a-4114-8d30-845e0bcc82e0";
+    const customerId = "non-existing-id";
+    const startDate = new Date("2023-10-01");
+    const endDate = new Date("2023-10-10");
+    await assert.rejects(
+      () => useCase.rentCar(carId, customerId, startDate, endDate),
+      (err) => {
+        assert.strictEqual((err as Error).message, "Customer not found");
+        return true;
+      }
+    );
+  });
+
+  it("should get available cars", async () => {
+    const startDate = new Date("2023-10-01");
+    const endDate = new Date("2023-10-10");
+    await useCase.rentCar(
+      "20203fef-4854-4abc-8153-67615f315b7e",
+      "123e4567-e89b-12d3-a456-426614174001",
+      startDate,
+      endDate
+    );
+    await useCase.rentCar(
+      "63bef23a-86ea-4d5e-87c1-91b7e7c496f5",
+      "123e4567-e89b-12d3-a456-426614174001",
+      startDate,
+      endDate
+    );
+    const carsPresenter = new CarsPresenter();
+    await useCase.getAvailableCarsBetween2Dates(
+      startDate,
+      endDate,
+      carsPresenter
+    );
+    await useCase.getAvailableCarsBetween2Dates(
+      startDate,
+      endDate,
+      carsPresenter
+    );
+
+    assert.strictEqual(carsPresenter.presentedValue.length, 1);
+    assert.deepEqual(carsPresenter.presentedValue[0], {
+      id: "1dc43148-e72a-4114-8d30-845e0bcc82e0",
+      make: "Tesla",
+      model: "3",
+      year: 2024,
+      color: "White",
+      mileage: 5000,
+      price: 50,
+      energy: energyValidator.enum.ELECTRIC,
+    });
   });
 });

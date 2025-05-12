@@ -61,6 +61,39 @@ export class CarsController {
     }
   }
 
+  async getAvailableCarsToHTML(req: FastifyRequest, res: FastifyReply) {
+    try {
+      const { startDate, endDate } = req.query as {
+        startDate: string;
+        endDate: string;
+      };
+      const htmlPresenter = new CarsHtmlPresenter();
+      await this.useCases.getAvailableCarsBetween2Dates(
+        new Date(startDate),
+        new Date(endDate),
+        htmlPresenter
+      );
+      const content = htmlPresenter.presentedValue;
+      const layout = Handlebars.compile(
+        fs.readFileSync(
+          path.resolve(__dirname, "../templates/layout.template.hbs"),
+          "utf-8"
+        )
+      )({
+        title: "Available Cars",
+      });
+
+      res
+        .status(200)
+        .type("text/html")
+        .send(layout.replace("<content />", content));
+    } catch (error) {
+      console.error("Error getting cars in HTML format:", error);
+      req.log.error("Error getting cars in HTML format:", error);
+      res.status(500).send({ error: "Internal Server Error" });
+    }
+  }
+
   getFastifyRoutes() {
     const routes = [
       {
@@ -101,6 +134,28 @@ export class CarsController {
           },
         },
         handler: this.getCarsToHTML.bind(this),
+      },
+      {
+        method: "GET",
+        path: "/available-cars/html",
+        schema: {
+          tags: ["cars"],
+          description: "Get available cars in HTML format",
+          querystring: {
+            type: "object",
+            properties: {
+              startDate: { type: "string", format: "date" },
+              endDate: { type: "string", format: "date" },
+            },
+            required: ["startDate", "endDate"],
+          },
+          response: {
+            200: {
+              type: "string",
+            },
+          },
+        },
+        handler: this.getAvailableCarsToHTML.bind(this),
       },
     ];
     return routes;

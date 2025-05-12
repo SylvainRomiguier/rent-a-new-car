@@ -1,0 +1,41 @@
+<div class="table-wrapper" id="rentalsTable">
+  <table class="fl-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Car ID</th>
+        <th>Customer ID</th>
+        <th>From</th>
+        <th>To</th>
+        <th>Total Price</th>
+        <th>Status</th>
+        <th colspan="2">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each rentals}}
+        <tr style="cursor: pointer;">
+          <td>{{id}}</td>
+          <td>{{carId}}</td>
+          <td>{{customerId}}</td>
+          <td>{{startDate}}</td>
+          <td>{{endDate}}</td>
+          <td>
+            {{totalPrice}}
+          </td>
+          <td>
+            {{status}}
+          </td>
+          <td><button
+              class="outline"
+              onclick="completeRental('{{id}}')"
+            >Complete</button></td>
+          <td><button
+              class="outline secondary"
+              onclick="cancelRental('{{id}}')"
+            >Cancel</button></td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</div>

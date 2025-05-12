@@ -5,7 +5,6 @@ import { Email, emailValidator } from "./Email";
 import { Phone, phoneValidator } from "./Phone";
 import { Address, addressValidator } from "./Address";
 
-
 export const customerPropertiesValidator = z.object({
   firstName: nameValidator,
   lastName: nameValidator,

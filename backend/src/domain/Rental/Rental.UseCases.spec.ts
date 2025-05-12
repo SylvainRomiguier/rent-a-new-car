@@ -36,7 +36,7 @@ describe("Rental Use Cases", () => {
         carService,
         customerService
     );
-    carUseCases = new CarUseCases(rentalService, carService);
+    carUseCases = new CarUseCases(rentalService, carService, customerService);
 
   });
 

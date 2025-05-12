@@ -3,7 +3,10 @@ import { ICustomerService } from "../ICustomerService";
 import { customersFixture } from "./customers.fixture";
 
 export class InMemoryCustomerService implements ICustomerService {
-  private customers: CustomerData[] = customersFixture;
+  private customers: CustomerData[] = [];
+  constructor() {
+    this.customers = [...customersFixture];
+  }
   async getCustomerById(customerId: string): Promise<CustomerData | null> {
     const customer = this.customers.find((c) => c.id === customerId);
     return customer || null;

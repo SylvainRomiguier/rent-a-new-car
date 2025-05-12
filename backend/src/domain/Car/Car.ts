@@ -113,4 +113,21 @@ export class CarWithPendingRentals extends Car {
 
     return newRental;
   }
+
+  isAvailableBetweenDates(startDate: CustomDate, endDate: CustomDate): boolean {
+    if (this.pendingRentals.length === 0) {
+      return true;
+    }
+
+    for (const rental of this.pendingRentals) {
+      try {
+        this.rent(new UUID(), startDate, endDate);
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
+
+    return true;
+  }
 }

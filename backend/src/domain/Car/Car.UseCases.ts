@@ -9,13 +9,14 @@ import {
   CarDataWithPendingRentals,
   CarWithPendingRentals,
   CarProperties,
-  carPropertiesValidator,
 } from "./Car";
+import { ICustomerService } from "../ICustomerService";
 
 export class CarUseCases {
   constructor(
     private rentalService: IRentalService,
-    private carService: ICarService
+    private carService: ICarService,
+    private customerService: ICustomerService
   ) {}
 
   async addCar(carData: CarProperties): Promise<void> {
@@ -41,6 +42,31 @@ export class CarUseCases {
     const carDataList = await this.carService.getAllCars();
     presenter.present(carDataList.map((carData) => new Car(carData).value));
   }
+
+  async getAvailableCarsBetween2Dates(
+    startDate: Date,
+    endDate: Date,
+    presenter: IPresenter<CarData[]>
+  ): Promise<void> {
+    const cars = await this.carService.getAllCars();
+    const availableCars = [];
+    for (const carData of cars) {
+      const pendingRentals = await this.rentalService.getPendingRentalsByCarId(
+        carData.id
+      );
+      const car = new CarWithPendingRentals(carData, pendingRentals);
+      if (
+        car.isAvailableBetweenDates(
+          new CustomDate(startDate),
+          new CustomDate(endDate)
+        )
+      ) {
+        availableCars.push(car.value);
+      }
+    }
+    presenter.present(availableCars.map((carData) => new Car(carData).value));
+  }
+
   async updateCar(carId: string, carProperties: CarProperties): Promise<void> {
     const car = await this.carService.getCarById(carId);
     if (!car) {
@@ -55,9 +81,6 @@ export class CarUseCases {
       throw new Error("Car not found");
     }
     const car = new Car(carData);
-    if (!car.value.id) {
-      throw new Error("Car ID is missing");
-    }
     await this.carService.deleteCar(car.value.id);
   }
 
@@ -70,6 +93,10 @@ export class CarUseCases {
     const carData = await this.carService.getCarById(carId);
     if (!carData) {
       throw new Error("Car not found");
+    }
+    const customerData = await this.customerService.getCustomerById(customerId);
+    if (!customerData) {
+      throw new Error("Customer not found");
     }
     const pendingRentals = await this.rentalService.getPendingRentalsByCarId(
       carData.id

@@ -6,7 +6,7 @@ export class InMemoryCarService implements ICarService {
   private cars: CarData[] = [];
 
   constructor() {
-    this.cars = carsFixture;
+    this.cars = [...carsFixture];
   }
 
   async getCarById(carId: string): Promise<CarData | null> {

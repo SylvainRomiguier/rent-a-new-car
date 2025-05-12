@@ -23,18 +23,33 @@ import { CustomerUseCases } from "../domain/Customer/Customer.UseCases";
 import { InMemoryCustomerService } from "../domain/__tests__/CustomerService.InMemory";
 import { CustomersController } from "../api/Customers/Customers.controller";
 import { CustomerController } from "../api/Customer/Customer.controller";
+import { RentalUseCases } from "../domain/Rental/Rental.UseCases";
+import { RentalsController } from "../api/Rentals/Rentals.controller";
+
+// Initialize the services
+const carService = new InMemoryCarService();
+const rentalService = new InMemoryRentalService();
+const customerService = new InMemoryCustomerService();
 
 // Initialize the use cases and controller
 const carUseCases = new CarUseCases(
-  new InMemoryRentalService(),
-  new InMemoryCarService()
+  rentalService,
+  carService,
+  customerService
 );
 const carsController = new CarsController(carUseCases);
 const carController = new CarController(carUseCases);
-const customerUseCases = new CustomerUseCases(new InMemoryCustomerService());
 
+const customerUseCases = new CustomerUseCases(customerService);
 const customerController = new CustomerController(customerUseCases);
 const customersController = new CustomersController(customerUseCases);
+
+const rentalsUseCases = new RentalUseCases(
+  rentalService,
+  carService,
+  customerService,
+);
+const rentalsController = new RentalsController(rentalsUseCases);
 
 // Register the routes
 const routes = [
@@ -42,6 +57,7 @@ const routes = [
   ...carController.getFastifyRoutes(),
   ...customersController.getFastifyRoutes(),
   ...customerController.getFastifyRoutes(),
+  ...rentalsController.getFastifyRoutes(),
 ];
 
 routes.forEach((route) => {
