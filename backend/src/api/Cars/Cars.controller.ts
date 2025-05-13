@@ -28,6 +28,28 @@ export class CarsController {
     }
   }
 
+  async getAvailableCarsToJSON(req: FastifyRequest, res: FastifyReply) {
+    try {
+      const { startDate, endDate } = req.query as {
+        startDate: string;
+        endDate: string;
+      };
+      const jsonPresenter = new CarsArrayJsonPresenter();
+      await this.useCases.getAvailableCarsBetween2Dates(
+        new Date(startDate),
+        new Date(endDate),
+        jsonPresenter
+      );
+      const cars = jsonPresenter.presentedValue;
+      if (!cars || cars.length === 0) {
+        return res.status(404).send({ error: "No cars found" });
+      }
+      res.status(200).send(cars);
+    } catch (error) {
+      res.status(500).send({ error: "Internal Server Error" });
+    }
+  }
+
   async getCarsToHTML(req: FastifyRequest, res: FastifyReply) {
     try {
       const htmlPresenter = new CarsHtmlPresenter();
@@ -117,8 +139,12 @@ export class CarsController {
           res.status(404).send({ error: "Car not found" });
         } else if (error.message === "Customer not found") {
           res.status(404).send({ error: "Customer not found" });
-        } else if (error.message === "Car is already rented for the selected dates.") {
-          res.status(409).send({ error: "Car is already rented for the selected dates." });
+        } else if (
+          error.message === "Car is already rented for the selected dates."
+        ) {
+          res
+            .status(409)
+            .send({ error: "Car is already rented for the selected dates." });
         } else {
           res.status(500).send({ error: "Internal Server Error" });
         }
@@ -171,6 +197,41 @@ export class CarsController {
       },
       {
         method: "GET",
+        path: "/available-cars/json",
+        schema: {
+          tags: ["cars"],
+          description: "Get available cars in JSON format",
+          querystring: {
+            type: "object",
+            properties: {
+              startDate: { type: "string", format: "date" },
+              endDate: { type: "string", format: "date" },
+            },
+            required: ["startDate", "endDate"],
+          },
+          response: {
+            200: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  id: { type: "string" },
+                  make: { type: "string" },
+                  model: { type: "string" },
+                  year: { type: "number" },
+                  mileage: { type: "number" },
+                  energy: { type: "string" },
+                  color: { type: "string" },
+                  price: { type: "number" },
+                },
+              },
+            },
+          },
+        },
+        handler: this.getAvailableCarsToJSON.bind(this),
+      },
+      {
+        method: "GET",
         path: "/available-cars/html",
         schema: {
           tags: ["cars"],
@@ -202,8 +263,8 @@ export class CarsController {
             properties: {
               carId: { type: "string" },
               customerId: { type: "string" },
-              startDate: { type: "string", format: "date-time" },
-              endDate: { type: "string", format: "date-time" },
+              startDate: { type: "string", format: "date" },
+              endDate: { type: "string", format: "date" },
             },
             required: ["carId", "customerId", "startDate", "endDate"],
           },
