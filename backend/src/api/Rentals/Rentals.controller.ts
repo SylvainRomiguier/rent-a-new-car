@@ -79,8 +79,8 @@ export class RentalsController {
           querystring: {
             type: "object",
             properties: {
-              startDate: { type: "string", format: "date-time" },
-              endDate: { type: "string", format: "date-time" },
+              startDate: { type: "string", format: "date" },
+              endDate: { type: "string", format: "date" },
             },
             required: ["startDate", "endDate"],
           },

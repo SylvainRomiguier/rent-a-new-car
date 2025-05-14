@@ -32,11 +32,7 @@ const rentalService = new InMemoryRentalService();
 const customerService = new InMemoryCustomerService();
 
 // Initialize the use cases and controller
-const carUseCases = new CarUseCases(
-  rentalService,
-  carService,
-  customerService
-);
+const carUseCases = new CarUseCases(rentalService, carService, customerService);
 const carsController = new CarsController(carUseCases);
 const carController = new CarController(carUseCases);
 
@@ -47,62 +43,70 @@ const customersController = new CustomersController(customerUseCases);
 const rentalsUseCases = new RentalUseCases(
   rentalService,
   carService,
-  customerService,
+  customerService
 );
 const rentalsController = new RentalsController(rentalsUseCases);
 
-// Register the routes
-const routes = [
-  ...carsController.getFastifyRoutes(),
-  ...carController.getFastifyRoutes(),
-  ...customersController.getFastifyRoutes(),
-  ...customerController.getFastifyRoutes(),
-  ...rentalsController.getFastifyRoutes(),
-];
-
-routes.forEach((route) => {
-  fastify.route({
-    method: route.method,
-    schema: route.schema,
-    url: route.path,
-    handler: route.handler,
-  });
-});
-
-// Declare swagger route
-fastify.register(fastifySwagger, {
-  openapi: {
-    openapi: "3.0.0",
-    info: {
-      title: "Car rental API",
-      description: "API for rental cars",
-      version: "0.1.0",
-    },
-    servers: [
-      {
-        url: "http://localhost:3000",
-        description: "Development server",
+const initSwagger = async () => {
+  fastify.register(fastifySwagger, {
+    mode: "dynamic",
+    openapi: {
+      openapi: "3.0.0",
+      info: {
+        title: "Car rental API",
+        description: "API for rental cars",
+        version: "0.1.0",
       },
-    ],
-    tags: [
-      { name: "customer", description: "Customer related end-points" },
-      { name: "car", description: "Car related end-points" },
-      { name: "cars", description: "Cars related end-points" },
-    ],
-  },
-});
+      servers: [
+        {
+          url: "http://localhost:3000",
+          description: "Development server",
+        },
+      ],
+      tags: [
+        { name: "customer", description: "Customer related end-points" },
+        { name: "car", description: "Car related end-points" },
+        { name: "cars", description: "Cars related end-points" },
+      ],
+    },
+  });
 
-fastify.register(fastifySwaggerUi, {
-  routePrefix: "/documentation",
-  uiConfig: {
-    docExpansion: "full",
-    deepLinking: false,
-  },
-});
+  fastify.register(fastifySwaggerUi, {
+    routePrefix: "/documentation",
+    uiConfig: {
+      docExpansion: "full",
+      deepLinking: false,
+    },
+  });
+};
 
 // Run the server!
 const start = async () => {
   try {
+    await initSwagger();
+    // Register the routes
+    const routes = [
+      ...carsController.getFastifyRoutes(),
+      ...carController.getFastifyRoutes(),
+      ...customersController.getFastifyRoutes(),
+      ...customerController.getFastifyRoutes(),
+      ...rentalsController.getFastifyRoutes(),
+    ];
+
+    routes.forEach((route) => {
+      fastify.register((instance, options, done) => {
+        fastify.route({
+          method: route.method,
+          schema: route.schema,
+          url: route.path,
+          handler: route.handler,
+        });
+        done();
+      });
+    });
+    await fastify.ready();
+    fastify.swagger();
+    fastify.log.info("Swagger initialized");
     await fastify.listen({ host: "0.0.0.0", port: 3000 });
     fastify.log.info(`Server is running at http://localhost:3000 youpi`);
   } catch (err) {
